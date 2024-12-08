@@ -1,0 +1,14 @@
+[
+  {
+    "username": "qwerty",
+    "password": "$2a$10$KAjUi/ApHIGByT.pDikxXOGVI3wAGwtEbLYXZpDUzfDAyQaKLvS3u"
+  },
+  {
+    "username": "asdfgh",
+    "password": "$2a$10$8moFRj022KRtk4ovFt964efQV9Y2HD6toaSRczMTgWrG5wZQ6fxca"
+  },
+  {
+    "username": "zxcvbn",
+    "password": "$2a$10$1hXUHlJ1MgtTcJgHVLDQJOLlBGEgmEs0dMNJlV5t0t/kqDHlmbN.O"
+  }
+]
