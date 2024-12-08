@@ -1,10 +1,22 @@
+
+
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
+    transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+}
+
+.light {
     background-color: #f0f0f0;
+    color: black;
+}
+
+.dark {
+    background-color: #333;
+    color: white;
 }
 
 .title {
@@ -26,4 +38,15 @@
 
 .button:hover {
     background-color: #e0e0e0;
+}
+
+/* Дополнительные стили для кнопки в темной теме */
+.dark .button {
+    background-color: #555;
+    border-color: white;
+    color: white;
+}
+
+.dark .button:hover {
+    background-color: #666;
 }

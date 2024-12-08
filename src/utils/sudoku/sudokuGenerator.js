@@ -93,13 +93,32 @@ function hasUniqueSolution(board) {
     return count === 1; // Проверяем, есть ли только одно решение
 }
 
-export function generateSudoku() {
+// Функция генерации судоку с учетом сложности
+export function generateSudoku(difficulty) {
     const board = createEmptyBoard();
     fillBoard(board);
-    removeNumbers(board, 40); // Удаляем 40 чисел, например
+
+    // Условия генерации в зависимости от сложности
+    let attempts;
+    switch (difficulty) {
+        case 'easy':
+            attempts = 36; // Удаляем 36 чисел для легкой сложности
+            break;
+        case 'medium':
+            attempts = 45; // Удаляем 45 чисел для средней сложности
+            break;
+        case 'hard':
+            attempts = 54; // Удаляем 54 числа для сложной сложности
+            break;
+        default:
+            attempts = 40; // Значение по умолчанию
+            break;
+    }
+
+    removeNumbers(board, attempts); // Удаляем числа
     return board.map(row => row.map(cell => (cell === -1 ? -1 : cell))); // Убедимся, что удаленные ячейки обозначены как -1
 }
 
 // Генерация судоку и форматирование результата
-const initial = generateSudoku();
+const initial = generateSudoku('medium'); // Задайте сложность по умолчанию
 export default initial;

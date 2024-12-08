@@ -1,48 +1,47 @@
-'use client';
+'use client'; // Указываем, что это клиентский компонент
 
 import React, { useState, useEffect } from 'react';
-import { loadAudio, setVolume, playAudio, pauseAudio, toggleLoop } from '/src/utils/setting/audio';
-import { applyTheme } from '/src/utils/setting/theme';
-import { getDifficultySettings } from '/src/utils/setting/sudoku';
+import { loadAudio, setVolume, playAudio, pauseAudio } from '/src/utils/setting/audio';
+import { useTheme } from '/src/utils/setting/ThemeContext'; // Импортируем контекст темы
+import styles from '/src/styles/settingsMenu.module.css'; // Импортируем стили
 
-export default function SettingsForm() {
-    const [volume, setVolumeState] = useState(50);
-    const [loop, setLoop] = useState(false);
-    const [theme, setTheme] = useState('light');
-    const [difficulty, setDifficulty] = useState('medium');
-    const [audio, setAudio] = useState(null); // Состояние для хранения экземпляра аудио
+export default function Settings() {
+    const { theme, applyTheme } = useTheme(); // Получаем тему и функцию применения темы из контекста
+    const [volume, setVolumeState] = useState(50); // Начальная громкость
+    const [loop, setLoop] = useState(false); // Зацикливание
+    const [difficulty, setDifficulty] = useState('medium'); // Сложность
+    const [audio, setAudio] = useState(null); // Аудио объект
 
-    // Состояние для хранения предыдущих настроек
-    const [previousSettings, setPreviousSettings] = useState({});
+    // Состояния темы
+    const [themeSelection, setThemeSelection] = useState('light');
 
     useEffect(() => {
-        // Загрузка предыдущих настроек из localStorage
-        const savedVolume = localStorage.getItem('volume');
+        // Загрузка сохранённых настроек из localStorage
+        const savedVolume = localStorage.getItem('volume') || 50;
         const savedLoop = localStorage.getItem('loop') === 'true';
         const savedTheme = localStorage.getItem('theme') || 'light';
         const savedDifficulty = localStorage.getItem('difficulty') || 'medium';
 
-        if (savedVolume) setVolumeState(Number(savedVolume));
-        if (savedLoop) setLoop(savedLoop);
-        setTheme(savedTheme);
-        setDifficulty(savedDifficulty);
-
-        const audioInstance = loadAudio("D:/Downloads/2ke-808iuli-x-slide-ultra-slowed-mp3.mp3"); // Замените на ваш трек
-        setAudio(audioInstance);
-        setVolume(savedVolume || volume);
+        setVolumeState(Number(savedVolume));
+        setLoop(savedLoop);
         applyTheme(savedTheme);
+        setDifficulty(savedDifficulty);
+        setThemeSelection(savedTheme);
+
+        const audioInstance = loadAudio("D:/Downloads/2ke-808iuli-x-slide-ultra-slowed-mp3.mp3");
+        setAudio(audioInstance);
 
         return () => {
             if (audioInstance) {
-                audioInstance.pause(); // Остановка аудио при размонтировании компонента
+                audioInstance.pause();
             }
         };
     }, []);
 
     useEffect(() => {
         if (audio) {
-            setVolume(volume);
-            audio.loop = loop; // Установка зацикливания
+            setVolume(volume / 100); // Приводим к диапазону от 0 до 1
+            audio.loop = loop;
         }
     }, [volume, loop, audio]);
 
@@ -50,117 +49,95 @@ export default function SettingsForm() {
         const newVolume = e.target.value;
         setVolumeState(newVolume);
         if (audio) {
-            setVolume(newVolume);
+            setVolume(newVolume / 100); // Приводим к диапазону от 0 до 1
         }
     };
 
     const handleThemeChange = (e) => {
         const newTheme = e.target.value;
-        setTheme(newTheme);
-        applyTheme(newTheme);
+        applyTheme(newTheme); // Применяем тему
+        localStorage.setItem('theme', newTheme); // Сохраняем тему в localStorage
+        setThemeSelection(newTheme);
     };
 
     const handleDifficultyChange = (e) => {
-        const newDifficulty = e.target.value;
-        setDifficulty(newDifficulty);
-        console.log('Количество оставленных цифр:', getDifficultySettings(newDifficulty));
-    };
-
-    const handleLoopChange = () => {
-        setLoop(!loop);
-    };
-
-    const handlePlayPause = () => {
-        if (audio) {
-            if (audio.paused) {
-                playAudio(audio); // Воспроизведение аудио
-                audio.play();
-            } else {
-                pauseAudio(audio); // Пауза аудио
-                audio.pause();
-            }
-        }
+        setDifficulty(e.target.value);
     };
 
     const handleSaveSettings = () => {
-        // Сохранение текущих настроек в localStorage
+        // Сохранение настроек в localStorage
         localStorage.setItem('volume', volume);
         localStorage.setItem('loop', loop);
-        localStorage.setItem('theme', theme);
         localStorage.setItem('difficulty', difficulty);
+        localStorage.setItem('theme', themeSelection);
     };
 
-    const handleCancelChanges = () => {
-        // Возврат к предыдущим настройкам
-        setVolumeState(previousSettings.volume || 50);
-        setLoop(previousSettings.loop || false);
-        setTheme(previousSettings.theme || 'light');
-        setDifficulty(previousSettings.difficulty || 'medium');
-        applyTheme(previousSettings.theme || 'light');
-    };
-
-    const handleBeforeSave = () => {
-        // Сохраняем текущие настройки перед изменением
-        setPreviousSettings({ volume, loop, theme, difficulty });
+    const handleResetSettings = () => {
+        // Сброс настроек
+        setVolumeState(50);
+        setThemeSelection('light');
+        setDifficulty('medium');
+        setLoop(false);
+        localStorage.clear();
     };
 
     return (
-        <form>
-            <div className="form-group">
-                <label htmlFor="volume">Громкость звука</label>
-                <input
-                    type="range"
-                    id="volume"
-                    min="0"
-                    max="100"
-                    value={volume}
-                    onChange={handleVolumeChange}
-                />
-                <span>{volume}</span> %
-            </div>
-            <div className="form-group">
-                <label htmlFor="theme">Тема оформления</label>
-                <select
-                    id="theme"
-                    value={theme}
-                    onChange={handleThemeChange}
-                >
-                    <option value="light">Светлая</option>
-                    <option value="dark">Тёмная</option>
-                    <option value="colorful">Цветная</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label htmlFor="difficulty">Сложность игры</label>
-                <select
-                    id="difficulty"
-                    value={difficulty}
-                    onChange={handleDifficultyChange}
-                >
-                    <option value="easy">Легко</option>
-                    <option value="medium">Средне</option>
-                    <option value="hard">Сложно</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={loop}
-                        onChange={handleLoopChange}
-                    />
-                    Зацикливать трек
+        <div className={`${styles.container} ${styles[themeSelection]}`}>
+            <h1 className={styles.title}>Настройки</h1>
+
+            <div className={styles.setting}>
+                <label className={styles.label}>
+                    Тема оформления:
+                    <select
+                        value={themeSelection}
+                        onChange={handleThemeChange}
+                        className={styles.select}
+                    >
+                        <option value="light">Светлая</option>
+                        <option value="dark">Тёмная</option>
+                        <option value="colorful">Цветная</option>
+                    </select>
                 </label>
             </div>
-            <button type="button" onClick={handlePlayPause}>
-                {audio && audio.paused ? 'Играть' : 'Пауза'}
-            </button>
-            <button type="button" onClick={() => { handleBeforeSave(); handleSaveSettings(); }}>
-                Сохранить настройки
-            </button>
-            <button type="button" onClick={handleCancelChanges}>
-                Отменить изменения
-            </button>
-        </form>
+
+            <div className={styles.setting}>
+                <label className={styles.label}>
+                    Сложность игры:
+                    <select
+                        value={difficulty}
+                        onChange={handleDifficultyChange}
+                        className={styles.select}
+                    >
+                        <option value="easy">Легко</option>
+                        <option value="medium">Средне</option>
+                        <option value="hard">Сложно</option>
+                    </select>
+                </label>
+            </div>
+
+            <div className={styles.setting}>
+                <label className={styles.label}>
+                    Громкость звука:
+                    <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        className={styles.slider}
+                    />
+                    <span>{volume}%</span>
+                </label>
+            </div>
+
+            <div className={styles.buttonContainer}>
+                <button type="button" onClick={handleSaveSettings} className={styles.button}>
+                    Сохранить изменения
+                </button>
+                <button type="button" onClick={handleResetSettings} className={styles.button}>
+                    Сбросить изменения
+                </button>
+            </div>
+        </div>
     );
 }
