@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { generateSudoku } from './sudokuGenerator'; // Импорт начального состоя
+import { generateSudoku } from './sudokuGenerator'; // Импорт функции генерации судоку
+
+export const saveDifficultyToLocalStorage = (difficulty) => {
+    console.log('Сложность сохранена:', difficulty);
+    localStorage.setItem('difficulty', difficulty); // Сохраняем сложность в localStorage
+};
 
 const SudokuGame = () => {
     const [board, setBoard] = useState([]);
+    const [difficulty, setDifficulty] = useState('medium'); // Устанавливаем значение по умолчанию
 
     useEffect(() => {
-        const initialBoard = generateSudoku();
+        const initialBoard = generateSudoku(difficulty); // Генерируем судоку с заданной сложностью
         setBoard(initialBoard);
-    }, []);
+        saveDifficultyToLocalStorage(difficulty); // Сохраняем сложность при генерации
+    }, [difficulty]); // Добавляем зависимость difficulty
 
     const handleCellClick = (row, col) => {
         console.log('Clicked cell:', row, col);
@@ -28,7 +35,7 @@ const SudokuGame = () => {
                     setBoard(newBoard);
                 } else {
                     alert("Неверный ход! Число нарушает правила судоку.");
-                    newBoard[row][col] = -1;
+                    newBoard[row][col] = -1; // Сброс значения в -1
                     setBoard(newBoard);
                 }
             } else {
@@ -43,15 +50,28 @@ const SudokuGame = () => {
         return checkRow(grid, row, num) && checkCol(grid, col, num) && checkBox(grid, row, col, num);
     };
 
+    const handleDifficultyChange = (event) => {
+        setDifficulty(event.target.value); // Устанавливаем новую сложность
+    };
+
     return (
         <div>
             <h1>Sudoku Game</h1>
+            <label htmlFor="difficulty">Выберите сложность:</label>
+            <select id="difficulty" value={difficulty} onChange={handleDifficultyChange}>
+                <option value="easy">Легко</option>
+                <option value="medium">Средне</option>
+                <option value="hard">Сложно</option>
+            </select>
             <div className="sudoku-grid">
                 {board.map((row, rowIndex) => (
                     <div key={rowIndex} className="sudoku-row">
                         {row.map((cell, colIndex) => (
-                            <div className={`sudoku-cell ${cell !== -1 ? 'filled' : 'empty'}`}
-                                 onClick={() => handleCellClick(rowIndex, colIndex)}>
+                            <div
+                                key={colIndex}
+                                className={`sudoku-cell ${cell !== -1 ? 'filled' : 'empty'}`}
+                                onClick={() => handleCellClick(rowIndex, colIndex)}
+                            >
                                 {cell !== -1 ? cell : ''}
                             </div>
                         ))}

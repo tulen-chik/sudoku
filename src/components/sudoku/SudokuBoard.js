@@ -1,11 +1,11 @@
 import React from 'react';
 import SudokuCell from '/src/components/sudoku/SudokuCell';
-import initial from '/src/utils/sudoku/sudokuGenerator';
 
-function SudokuBoard({ sudokuArr, setSudokuArr }) {
+function SudokuBoard({ sudokuArr, setSudokuArr, initial }) {
     function onInputChange(e, row, col) {
         const val = parseInt(e.target.value) || -1;
         const grid = JSON.parse(JSON.stringify(sudokuArr));
+
         if (val === -1 || (val >= 1 && val <= 9)) {
             grid[row][col] = val;
         }

@@ -1,46 +1,44 @@
-'use client'; // Указываем, что это клиентский компонент
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { loadAudio, setVolume, playAudio, pauseAudio } from '/src/utils/setting/audio';
-import { useTheme } from '/src/utils/setting/ThemeContext'; // Импортируем контекст темы
-import styles from '/src/styles/settingsMenu.module.css'; // Импортируем стили
+import { useTheme } from '/src/utils/setting/ThemeContext';
+import styles from '/src/styles/settingsMenu.module.css';
 
 export default function Settings() {
-    const { theme, applyTheme } = useTheme(); // Получаем тему и функцию применения темы из контекста
-    const [volume, setVolumeState] = useState(50); // Начальная громкость
-    const [loop, setLoop] = useState(false); // Зацикливание
-    const [difficulty, setDifficulty] = useState('medium'); // Сложность
-    const [audio, setAudio] = useState(null); // Аудио объект
-
-    // Состояния темы
+    const { theme, applyTheme } = useTheme();
+    const [volume, setVolumeState] = useState(50);
+    const [loop, setLoop] = useState(false);
+    const [audio, setAudio] = useState(null);
     const [themeSelection, setThemeSelection] = useState('light');
+    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
-        // Загрузка сохранённых настроек из localStorage
         const savedVolume = localStorage.getItem('volume') || 50;
         const savedLoop = localStorage.getItem('loop') === 'true';
         const savedTheme = localStorage.getItem('theme') || 'light';
-        const savedDifficulty = localStorage.getItem('difficulty') || 'medium';
 
         setVolumeState(Number(savedVolume));
         setLoop(savedLoop);
         applyTheme(savedTheme);
-        setDifficulty(savedDifficulty);
         setThemeSelection(savedTheme);
 
-        const audioInstance = loadAudio("D:/Downloads/2ke-808iuli-x-slide-ultra-slowed-mp3.mp3");
+        const audioInstance = new Audio('D://Downloads//2ke-808iuli-x-slide-ultra-slowed-mp3.mp3'); // Измените путь
+        audioInstance.loop = savedLoop;
+        audioInstance.volume = savedVolume / 100;
+
         setAudio(audioInstance);
 
         return () => {
             if (audioInstance) {
                 audioInstance.pause();
+                audioInstance.src = "";
             }
         };
     }, []);
 
     useEffect(() => {
         if (audio) {
-            setVolume(volume / 100); // Приводим к диапазону от 0 до 1
+            audio.volume = volume / 100;
             audio.loop = loop;
         }
     }, [volume, loop, audio]);
@@ -49,36 +47,38 @@ export default function Settings() {
         const newVolume = e.target.value;
         setVolumeState(newVolume);
         if (audio) {
-            setVolume(newVolume / 100); // Приводим к диапазону от 0 до 1
+            audio.volume = newVolume / 100;
         }
     };
 
     const handleThemeChange = (e) => {
         const newTheme = e.target.value;
-        applyTheme(newTheme); // Применяем тему
-        localStorage.setItem('theme', newTheme); // Сохраняем тему в localStorage
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
         setThemeSelection(newTheme);
     };
 
-    const handleDifficultyChange = (e) => {
-        setDifficulty(e.target.value);
-    };
-
     const handleSaveSettings = () => {
-        // Сохранение настроек в localStorage
         localStorage.setItem('volume', volume);
         localStorage.setItem('loop', loop);
-        localStorage.setItem('difficulty', difficulty);
         localStorage.setItem('theme', themeSelection);
     };
 
     const handleResetSettings = () => {
-        // Сброс настроек
         setVolumeState(50);
         setThemeSelection('light');
-        setDifficulty('medium');
         setLoop(false);
         localStorage.clear();
+    };
+
+    const handlePlayMusic = () => {
+        if (audio) {
+            audio.play().then(() => {
+                setIsPlaying(true);
+            }).catch(error => {
+                console.error("Не удалось воспроизвести:", error);
+            });
+        }
     };
 
     return (
@@ -96,21 +96,6 @@ export default function Settings() {
                         <option value="light">Светлая</option>
                         <option value="dark">Тёмная</option>
                         <option value="colorful">Цветная</option>
-                    </select>
-                </label>
-            </div>
-
-            <div className={styles.setting}>
-                <label className={styles.label}>
-                    Сложность игры:
-                    <select
-                        value={difficulty}
-                        onChange={handleDifficultyChange}
-                        className={styles.select}
-                    >
-                        <option value="easy">Легко</option>
-                        <option value="medium">Средне</option>
-                        <option value="hard">Сложно</option>
                     </select>
                 </label>
             </div>
@@ -137,6 +122,11 @@ export default function Settings() {
                 <button type="button" onClick={handleResetSettings} className={styles.button}>
                     Сбросить изменения
                 </button>
+                {!isPlaying && (
+                    <button type="button" onClick={handlePlayMusic} className={styles.button}>
+                        Воспроизвести музыку
+                    </button>
+                )}
             </div>
         </div>
     );

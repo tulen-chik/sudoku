@@ -1,3 +1,5 @@
+// sudokuGenerator.js
+
 const SIZE = 9; // Размер поля
 const SUBGRID_SIZE = 3; // Размер подрешетки
 
@@ -118,7 +120,3 @@ export function generateSudoku(difficulty) {
     removeNumbers(board, attempts); // Удаляем числа
     return board.map(row => row.map(cell => (cell === -1 ? -1 : cell))); // Убедимся, что удаленные ячейки обозначены как -1
 }
-
-// Генерация судоку и форматирование результата
-const initial = generateSudoku('medium'); // Задайте сложность по умолчанию
-export default initial;
