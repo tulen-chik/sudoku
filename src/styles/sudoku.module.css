@@ -22,7 +22,6 @@ h3 {
     display: grid;
     grid-template-columns: repeat(9, 40px);
     grid-template-rows: repeat(9, 40px);
-    border: 2px solid #000;
     margin-bottom: 20px;
 }
 
@@ -31,8 +30,38 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
-    background-color: #fff;
+    font-size: 24px; /* Увеличенный размер шрифта */
+    transition: background-color 0.3s, border 0.3s;
+}
+
+/* Выделение границ модулей 3x3 */
+.sudokuBoard div:nth-child(3n+1) {
+    border-left: 2px solid #000; /* Левый край каждого модуля 3x3 */
+}
+
+.sudokuBoard div:nth-child(-n+27) {
+    border-top: 2px solid #000; /* Верхний край первых трех модулей 3x3 */
+}
+
+.sudokuBoard div:nth-child(-n+9):nth-child(3n+1) {
+    border-top: 2px solid #000; /* Верхний край первого модуля 3x3 */
+}
+
+.sudokuBoard div:nth-child(n+28):nth-child(3n+1) {
+    border-top: 2px solid #000; /* Верхний край последнего модуля 3x3 */
+}
+
+/* Удаляем лишние границы между модулями 3x3 */
+.sudokuBoard div:nth-child(3n+3) {
+    border-right: none; /* Убираем правую границу для последнего элемента в строке каждого модуля */
+}
+
+.sudokuBoard div:nth-child(27n+1) {
+    border-bottom: 2px solid #000; /* Нижний край для последнего ряда модулей 3x3 */
+}
+
+.sudokuBoard div:nth-child(27n+3) {
+    border-bottom: none; /* Убираем нижнюю границу для последнего элемента в строке каждого модуля */
 }
 
 .buttonPanel {
