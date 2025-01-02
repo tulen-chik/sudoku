@@ -1,20 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // Импортируем useRouter
 import SudokuBoard from '/src/components/sudoku/SudokuBoard';
 import ButtonPanel from '/src/components/sudoku/ButtonPanel';
-import { solver, checkSudokuValidity } from '/src/utils/sudoku/sudokuSolver';
-import { generateSudoku } from '/src/utils/sudoku/sudokuGenerator'; // Импортируем генератор судоку
-import styles from '../../../styles/globals.css'; // Importing global styles
+import { solver } from '/src/utils/sudoku/sudokuSolver';
+import { generateSudoku } from '/src/utils/sudoku/sudokuGenerator';
+import styles from '../../../styles/globals.css';
 
 function Home() {
-    const [difficulty, setDifficulty] = useState('medium'); // Состояние для сложности
-    const [sudokuArr, setSudokuArr] = useState(generateSudoku('medium')); // Генерация судоку по умолчанию
-    const [initial, setInitial] = useState(generateSudoku('medium')); // Начальные значения
-    const [errors, setErrors] = useState([]); // Состояние для хранения ошибок
+    const router = useRouter(); // Используем useRouter для навигации
+    const [difficulty, setDifficulty] = useState('medium');
+    const [sudokuArr, setSudokuArr] = useState(generateSudoku('medium', true)); // true для генерации с пустыми ячейками
+    const [initial, setInitial] = useState(generateSudoku('medium', true)); // Начальные значения
+    const [errors, setErrors] = useState([]);
 
     useEffect(() => {
-        const generatedSudoku = generateSudoku(difficulty);
+        const generatedSudoku = generateSudoku(difficulty, true); // true для генерации с пустыми ячейками
         setSudokuArr(generatedSudoku);
         setInitial(generatedSudoku); // Сохраняем начальные значения
         setErrors([]); // Сбрасываем ошибки при изменении сложности
@@ -26,9 +28,8 @@ function Home() {
     }
 
     function checkSudoku() {
-        const newErrors = []; // Хранит ошибки
+        const newErrors = [];
 
-        // Проверка строк, столбцов и подрешеток
         for (let i = 0; i < 9; i++) {
             const rowSet = new Set();
             const colSet = new Set();
@@ -75,7 +76,7 @@ function Home() {
     }
 
     function solveSudoku() {
-        let sudoku = generateSudoku(difficulty);
+        let sudoku = generateSudoku(difficulty, false); // false для получения заполненной таблицы
         solver(sudoku);
         setSudokuArr(sudoku);
     }
@@ -84,7 +85,7 @@ function Home() {
         // Обновляем sudokuArr, сбрасывая только пользовательские вводы
         const newSudokuArr = sudokuArr.map((row, rIndex) =>
             row.map((cell, cIndex) =>
-                initial[rIndex][cIndex] === -1 ? -1 : cell // Если начальное значение -1, сбрасываем, иначе оставляем
+                initial[rIndex][cIndex] === -1 ? -1 : cell
             )
         );
         setSudokuArr(newSudokuArr);
@@ -105,6 +106,13 @@ function Home() {
                     solveSudoku={solveSudoku}
                     resetSudoku={resetSudoku}
                 />
+                {/* Кнопка в правом верхнем углу */}
+                <button
+                    className={styles.orangeButton}
+                    onClick={() => router.push('/user/sudoku/sudokyOfTheDay')} // Путь к странице судоку дня
+                >
+                    +
+                </button>
             </div>
         </div>
     );

@@ -86,3 +86,31 @@ body.colorful {
   background: linear-gradient(to right, #ff7e5f, #feb47b);
   color: white;
 }
+
+/* Добавьте это в ваш файл стилей */
+.orangeButton {
+  position: absolute; /* Позволяет разместить кнопку в углу */
+  top: 20px;         /* Отступ сверху */
+  right: 20px;       /* Отступ справа */
+  width: 50px;       /* Ширина кнопки */
+  height: 50px;      /* Высота кнопки */
+  border: none;      /* Убираем рамку */
+  border-radius: 50%; /* Делаем кнопку круглой */
+  background-color: orange; /* Цвет фона */
+  color: white;      /* Цвет текста */
+  font-size: 24px;   /* Размер шрифта */
+  cursor: pointer;   /* Указатель курсора */
+  display: flex;     /* Центрируем текст */
+  align-items: center; /* Вертикальное выравнивание текста */
+  justify-content: center; /* Горизонтальное выравнивание текста */
+  z-index: 10;      /* Убедитесь, что кнопка выше других элементов */
+}
+
+.orangeButton:hover {
+  background-color: darkorange; /* Изменение цвета при наведении */
+}
+
+.header h3 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}

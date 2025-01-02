@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 import { generateSudoku } from '/src/utils/sudoku/sudokuGenerator';
 import styles from '/src/styles/dailysudoky.css';
 import { useRouter } from "next/navigation";
-import { useSudoku } from '/src/context/SudokuContext'; // Импортируйте контекст
 
 export default function DailySudoku() {
-    const { setSudoku } = useSudoku(); // Используем контекст
     const [difficulty, setDifficulty] = useState('medium');
     const [sudokuArr, setSudokuArr] = useState(generateSudoku(difficulty, true));
     const [initial, setInitial] = useState(generateSudoku(difficulty, true));
@@ -31,11 +29,36 @@ export default function DailySudoku() {
         setSudokuArr(newBoard);
     };
 
-    const handleSubmit = () => {
-        const serializedInitial = JSON.stringify(initial);
-        setSudoku(serializedInitial); // Сохраняем в контексте
-        console.log("Судоку сохранено:", serializedInitial); // Логируем сохраненное судоку
-        alert("Судоку сохранено. Вы можете перейти на страницу Судоку дня, когда захотите.");
+    const handleSubmit = async () => {
+        const serializedInitial = JSON.stringify(initial); // Данные судоку
+
+        // Создаем объект в нужном формате
+        const dataToSend = {
+            sudoku: serializedInitial
+        };
+
+        console.log("Судоку сохранено:", dataToSend);
+
+        // Отправка данных на сервер
+        try {
+            const response = await fetch('/api/sudoku/dailySudoku', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend), // Отправляем отформатированный объект
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении судоку');
+            }
+
+            const data = await response.json();
+            alert(data.message);
+        } catch (error) {
+            console.error('Ошибка при отправке данных:', error);
+            alert('Ошибка при сохранении судоку: ' + error.message);
+        }
     };
 
     return (

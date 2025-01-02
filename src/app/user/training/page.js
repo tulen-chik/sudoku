@@ -1,4 +1,5 @@
 import React from 'react';
+
 const SudokuRules = () => {
     return (
         <div style={styles.container}>
@@ -51,6 +52,7 @@ const styles = {
     intro: {
         fontSize: '18px',
         marginBottom: '20px',
+        color: '#555', // Изменен цвет текста на тот же, что и у подзаголовков
     },
     subtitle: {
         marginTop: '20px',
