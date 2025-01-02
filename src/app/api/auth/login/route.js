@@ -1,42 +1,39 @@
-import fs from 'fs';
-import bcrypt from 'bcryptjs';
+'use server';
 
-const usersFilePath = './users.json';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(req) {
-    const { username, password } = await req.json();
-
-    // Проверка существования пользователя
-    let users = [];
     try {
-        const data = fs.readFileSync(usersFilePath, 'utf-8');
-        users = JSON.parse(data);
+        const { username, password } = await req.json();
+
+        // Чтение пользователей из JSON файла
+        const usersFilePath = path.join(process.cwd(), 'src/users.json');
+        const usersData = fs.readFileSync(usersFilePath, 'utf-8');
+        const users = JSON.parse(usersData);
+
+        // Поиск пользователя
+        const user = users.find((user) => user.username === username && user.password === password);
+
+        if (!user) {
+            return new Response(JSON.stringify({ message: 'Пользователь не найден или неверный пароль' }), {
+                status: 401,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        // Возвращаем роль пользователя и сообщение об успешном входе
+        return new Response(JSON.stringify({
+            role: user.role,
+            message: 'Успешный вход'
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
     } catch (error) {
-        return new Response(JSON.stringify({ message: 'Ошибка чтения пользователей' }), {
+        return new Response(JSON.stringify({ message: 'Ошибка сервера: ' + error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
     }
-
-    const existingUser = users.find(user => user.username === username);
-    if (!existingUser) {
-        return new Response(JSON.stringify({ message: 'Пользователь не найден' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
-    // Проверка пароля
-    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
-    if (!isPasswordValid) {
-        return new Response(JSON.stringify({ message: 'Неверный пароль' }), {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
-    return new Response(JSON.stringify({ message: 'Успешный вход' }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-    });
 }

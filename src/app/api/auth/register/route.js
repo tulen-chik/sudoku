@@ -1,41 +1,44 @@
-import fs from 'fs';
-import bcrypt from 'bcryptjs';
+'use server';
 
-const usersFilePath = './users.json';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(req) {
-    const { username, password } = await req.json();
+    const { username, password, isAdmin } = await req.json();
+    const role = isAdmin ? 'admin' : 'user';
+    const usersFilePath = path.join(process.cwd(), 'src/users.json');
 
     let users = [];
     try {
-        const data = fs.readFileSync(usersFilePath, 'utf-8');
-        users = JSON.parse(data);
-    } catch (error) {
-        // Если файл не существует или содержит ошибку, инициализируем пустой массив
-        if (error.code === 'ENOENT') {
-            fs.writeFileSync(usersFilePath, JSON.stringify([]));
-        } else {
-            return new Response(JSON.stringify({ message: 'Ошибка чтения пользователей' }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' },
-            });
+        if (fs.existsSync(usersFilePath)) {
+            const usersData = fs.readFileSync(usersFilePath, 'utf-8');
+            users = JSON.parse(usersData);
         }
+    } catch (error) {
+        console.error('Ошибка при чтении файла:', error);
     }
 
     const existingUser = users.find(user => user.username === username);
     if (existingUser) {
-        return new Response(JSON.stringify({ message: 'Пользователь уже существует' }), {
+        return new Response(JSON.stringify({ message: 'Пользователь с таким именем уже существует' }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
         });
     }
 
-    // Хеширование пароля
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users.push({ username, password: hashedPassword });
+    const newUser = { username, password, role };
+    console.log('Новый пользователь:', newUser);
+    users.push(newUser);
 
-    // Запись в файл
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    try {
+        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    } catch (error) {
+        console.error('Ошибка при записи файла:', error);
+        return new Response(JSON.stringify({ message: 'Ошибка сохранения пользователя' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
 
     return new Response(JSON.stringify({ message: 'Пользователь зарегистрирован' }), {
         status: 201,

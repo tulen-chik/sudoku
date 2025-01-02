@@ -1,28 +1,41 @@
-// src/components/Login.jsx
-
 'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import '/src/styles/login.css'; // Импорт стилей
 
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const router = useRouter();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
-        const data = await response.json();
-        setMessage(data.token ? 'Вход успешен!' : data.message);
+        setMessage('');
 
-        if (response.ok) {
-            localStorage.setItem('token', data.token);
-            window.location.href = '/user'; // Перенаправление на страницу пользователя
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMessage(data.message);
+                return;
+            }
+
+            // Сохранение сессии в localStorage только после успешного входа
+            localStorage.setItem('session', JSON.stringify({ role: data.role }));
+
+            // Перенаправление на основе роли
+            router.push(data.role === 'admin' ? '/admin' : '/user');
+        } catch (error) {
+            setMessage('Ошибка сети: ' + error.message);
+            console.error('Login error:', error);
         }
     };
 

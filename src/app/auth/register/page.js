@@ -1,27 +1,36 @@
-
 'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import '/src/styles/regiser.css'; // Импорт стилей
 
 export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false); // Состояние для роли админа
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
-        const data = await response.json();
-        setMessage(data.message);
 
-        if (response.ok) {
-            // Перенаправление на страницу логина после успешной регистрации
-            window.location.href = '/auth/login';
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, isAdmin }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMessage(data.message);
+            } else {
+                setMessage('Пользователь зарегистрирован');
+                // Перенаправление на страницу логина или главную
+                window.location.href = '/auth/login'; // Перенаправление на страницу логина
+            }
+        } catch (error) {
+            setMessage('Ошибка сети: ' + error.message);
+            console.error('Registration error:', error);
         }
     };
 
@@ -32,7 +41,7 @@ export default function Register() {
                 <div className="input-group">
                     <input
                         type="text"
-                        placeholder="Имя пользователя"
+                        placeholder="Логин"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
@@ -46,6 +55,16 @@ export default function Register() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                </div>
+                <div className="input-group">
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={isAdmin}
+                            onChange={() => setIsAdmin(!isAdmin)} // Переключение роли админа
+                        />
+                        Я администратор
+                    </label>
                 </div>
                 <button type="submit">Зарегистрироваться</button>
             </form>
