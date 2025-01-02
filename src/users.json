@@ -1,0 +1,17 @@
+[
+  {
+    "username": "qwerty",
+    "password": "qwerty",
+    "role": "user"
+  },
+  {
+    "username": "admin",
+    "password": "admin",
+    "role": "admin"
+  },
+  {
+    "username": "asdfgh",
+    "password": "asdfgh",
+    "role": "user"
+  }
+]
