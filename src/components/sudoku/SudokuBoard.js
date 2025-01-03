@@ -1,18 +1,24 @@
 import React from 'react';
 import SudokuCell from '/src/components/sudoku/SudokuCell';
-import styles from '/src/styles/sudoku.module.css'; // Добавьте стили, если нужно
+import styles from '/src/styles/sudoku.module.css';
 
 function SudokuBoard({ sudokuArr, setSudokuArr, initial, errors }) {
     function onInputChange(e, row, col) {
-        const val = parseInt(e.target.value) || -1; // Преобразуем ввод в число или -1
-        const grid = JSON.parse(JSON.stringify(sudokuArr)); // Глубокое копирование массива
+        const val = parseInt(e.target.value) || -1;
+        const grid = JSON.parse(JSON.stringify(sudokuArr));
 
-        // Проверяем, является ли ввод допустимым
         if (val === -1 || (val >= 1 && val <= 9)) {
-            grid[row][col] = val; // Устанавливаем значение в сетке
-            setSudokuArr(grid); // Обновляем состояние
+            grid[row][col] = val;
+            setSudokuArr(grid);
         }
     }
+
+    if (!Array.isArray(sudokuArr)) {
+        console.error("sudokuArr не является массивом:", sudokuArr);
+        return <div>Ошибка загрузки судоку.</div>;
+    }
+
+    console.log("Sudoku Array:", sudokuArr);
 
     return (
         <table className={styles.sudokuTable}>
@@ -26,8 +32,8 @@ function SudokuBoard({ sudokuArr, setSudokuArr, initial, errors }) {
                                 key={cIndex}
                                 value={cell}
                                 onInputChange={(e) => onInputChange(e, rIndex, cIndex)}
-                                disabled={initial[rIndex][cIndex] !== -1} // Блокируем редактирование, если это изначальное значение
-                                error={isError} // Передаем информацию об ошибке
+                                disabled={initial[rIndex][cIndex] !== -1}
+                                error={isError}
                             />
                         );
                     })}

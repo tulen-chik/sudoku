@@ -13,5 +13,15 @@
     "username": "asdfgh",
     "password": "asdfgh",
     "role": "user"
+  },
+  {
+    "username": "zxcvbn",
+    "password": "zxcvbn",
+    "role": "user"
+  },
+  {
+    "username": "poiuyt",
+    "password": "poiuyt",
+    "role": "admin"
   }
 ]
