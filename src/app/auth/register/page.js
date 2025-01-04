@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import '/src/styles/regiser.css'; // Импорт стилей
+import styles from '/src/app/auth/register/register.module.css'; // Импорт стилей как CSS модуля
 
 export default function Register() {
     const [username, setUsername] = useState('');
@@ -35,41 +35,35 @@ export default function Register() {
     };
 
     return (
-        <div className="register-container">
-            <h1>Регистрация</h1>
-            <form onSubmit={handleRegister}>
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="Логин"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="input-group">
-                    <input
-                        type="password"
-                        placeholder="Пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="input-group">
-                    <label>
+        <div className={styles.registerContainer}>
+            <div className={styles.registerForm}>
+                <h1 className={styles.registerTitle}>Регистрация</h1>
+                <form onSubmit={handleRegister}>
+                    <div className={styles.inputGroup}>
                         <input
-                            type="checkbox"
-                            checked={isAdmin}
-                            onChange={() => setIsAdmin(!isAdmin)} // Переключение роли админа
+                            className={styles.inputField}
+                            type="text"
+                            placeholder="Логин"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
                         />
-                        Я администратор
-                    </label>
-                </div>
-                <button type="submit">Зарегистрироваться</button>
-            </form>
-            {message && <p className="message">{message}</p>}
-            <p>Уже есть аккаунт? <a href="/auth/login">Войти</a></p>
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input
+                            className={styles.inputField}
+                            type="password"
+                            placeholder="Пароль"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button className={styles.registerButton} type="submit">Зарегистрироваться</button>
+                </form>
+                {message && <p className={styles.message}>{message}</p>}
+                <p>Уже есть аккаунт? <a href="/auth/login">Войти</a></p>
+            </div>
         </div>
     );
 }

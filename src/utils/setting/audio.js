@@ -1,5 +1,3 @@
-// src/app/user/setting/utils/audio.js
-
 let audio = null;
 
 export const loadAudio = (src) => {

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '/src/utils/setting/ThemeContext';
-import styles from '/src/styles/settingsMenu.module.css';
+import styles from './page.module.css';
 
 export default function Settings() {
     const { theme, applyTheme } = useTheme();
@@ -10,7 +10,7 @@ export default function Settings() {
     const [loop, setLoop] = useState(false);
     const [audio, setAudio] = useState(null);
     const [themeSelection, setThemeSelection] = useState('light');
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(true);
 
     useEffect(() => {
         const savedVolume = localStorage.getItem('volume') || 50;
@@ -22,7 +22,7 @@ export default function Settings() {
         applyTheme(savedTheme);
         setThemeSelection(savedTheme);
 
-        const audioInstance = new Audio('D://Downloads//2ke-808iuli-x-slide-ultra-slowed-mp3.mp3'); // Измените путь
+        const audioInstance = new Audio('/audio/1.mp3'); // Измените путь
         audioInstance.loop = savedLoop;
         audioInstance.volume = savedVolume / 100;
 
@@ -82,52 +82,55 @@ export default function Settings() {
     };
 
     return (
-        <div className={`${styles.container} ${styles[themeSelection]}`}>
-            <h1 className={styles.title}>Настройки</h1>
+        <div className={styles.outer_container}>
+            <div className={`${styles.container} ${styles[themeSelection]}`}>
+                <h1 className={styles.title}>Настройки</h1>
 
-            <div className={styles.setting}>
-                <label className={styles.label}>
-                    Тема оформления:
-                    <select
-                        value={themeSelection}
-                        onChange={handleThemeChange}
-                        className={styles.select}
-                    >
-                        <option value="light">Светлая</option>
-                        <option value="dark">Тёмная</option>
-                        <option value="colorful">Цветная</option>
-                    </select>
-                </label>
-            </div>
+                <div className={styles.setting}>
+                    <label className={styles.label}>
+                        Тема оформления:
+                        <select
+                            value={themeSelection}
+                            onChange={handleThemeChange}
+                            className={styles.select}
+                        >
+                            <option value="light">Светлая</option>
+                            <option value="dark">Тёмная</option>
+                            <option value="colorful">Цветная</option>
+                        </select>
+                    </label>
+                </div>
 
-            <div className={styles.setting}>
-                <label className={styles.label}>
-                    Громкость звука:
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={volume}
-                        onChange={handleVolumeChange}
-                        className={styles.slider}
-                    />
-                    <span>{volume}%</span>
-                </label>
-            </div>
+                <div className={styles.setting}>
+                    <label className={styles.label}>
+                        Громкость звука:
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={volume}
+                            onChange={handleVolumeChange}
+                            className={styles.slider}
+                        />
+                        <span>{volume}%</span>
+                    </label>
+                </div>
 
-            <div className={styles.buttonContainer}>
-                <button type="button" onClick={handleSaveSettings} className={styles.button}>
-                    Сохранить изменения
-                </button>
-                <button type="button" onClick={handleResetSettings} className={styles.button}>
-                    Сбросить изменения
-                </button>
-                {!isPlaying && (
-                    <button type="button" onClick={handlePlayMusic} className={styles.button}>
-                        Воспроизвести музыку
+                <div className={styles.buttonContainer}>
+                    <button type="button" onClick={handleSaveSettings} className={styles.button}>
+                        Сохранить изменения
                     </button>
-                )}
+                    <button type="button" onClick={handleResetSettings} className={styles.button}>
+                        Сбросить изменения
+                    </button>
+                    {!isPlaying && (
+                        <button type="button" onClick={handlePlayMusic} className={styles.button}>
+                            Воспроизвести музыку
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
+
     );
 }

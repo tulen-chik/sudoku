@@ -61,6 +61,7 @@ const styles = {
     list: {
         listStyleType: 'disc',
         paddingLeft: '20px',
+        color: '#555',
     },
 };
 

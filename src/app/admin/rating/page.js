@@ -1,7 +1,40 @@
+"use client"
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import styles from '/src/styles/rating.css';
+import styles from './page.module.css';
 
-export default function Home() {
+export default function AdminRating() {
+    const [topUsers, setTopUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchTopUsers = async () => {
+            try {
+                const res = await fetch('http://localhost:3000/api/users'); // Replace with your API URL
+                if (!res.ok) {
+                    throw new Error(`Error fetching data: ${res.status}`);
+                }
+                const data = await res.json();
+                setTopUsers(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTopUsers();
+    }, []); // Empty dependency array means this runs once on mount
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
     return (
         <div className={styles.container}>
             <Head>
@@ -10,11 +43,6 @@ export default function Home() {
             </Head>
             <main className={styles.main}>
                 <h1 className={styles.title}>Рейтинг игроков:</h1>
-                <div className={styles.medals}>
-                    <div className={styles.medal} style={{ backgroundColor: 'gold' }}></div>
-                    <div className={styles.medal} style={{ backgroundColor: 'silver' }}></div>
-                    <div className={styles.medal} style={{ backgroundColor: 'orange' }}></div>
-                </div>
                 <table className={styles.table}>
                     <thead>
                     <tr>
@@ -24,21 +52,13 @@ export default function Home() {
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Игрок 1</td>
-                        <td>10</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Игрок 2</td>
-                        <td>8</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Игрок 3</td>
-                        <td>6</td>
-                    </tr>
+                    {topUsers.map((user, index) => (
+                        <tr key={user.username}>
+                            <td>{index + 1}</td>
+                            <td>{user.username}</td>
+                            <td>{user.rating}</td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </main>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { generateSudoku } from '/src/utils/sudoku/sudokuGenerator';
-import styles from '/src/styles/dailysudoky.css';
+import styles from './page.module.css';
 import { useRouter } from "next/navigation";
 
 export default function DailySudoku() {

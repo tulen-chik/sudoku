@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '/src/styles/mainMenu.module.css';
+import styles from '/src/app/user/page.module.css';
 
 const Home = () => {
     const router = useRouter();

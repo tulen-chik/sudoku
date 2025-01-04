@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import SudokuCell from '/src/components/sudoku/SudokuCell';
 import styles from '/src/styles/sudoku.module.css';
@@ -13,12 +14,15 @@ function SudokuBoard({ sudokuArr, setSudokuArr, initial, errors }) {
         }
     }
 
+    if (sudokuArr === false || sudokuArr === true)
+        return <></>
+
     if (!Array.isArray(sudokuArr)) {
         console.error("sudokuArr не является массивом:", sudokuArr);
         return <div>Ошибка загрузки судоку.</div>;
     }
 
-    console.log("Sudoku Array:", sudokuArr);
+    // console.log("Sudoku Array:", sudokuArr);
 
     return (
         <table className={styles.sudokuTable}>

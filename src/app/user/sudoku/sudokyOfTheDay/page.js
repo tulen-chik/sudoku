@@ -3,12 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import SudokuBoard from '/src/components/sudoku/SudokuBoard';
 import ButtonPanel from '/src/components/sudoku/ButtonPanel';
-import styles from '/src/styles/globals.css';
+import { useRouter } from 'next/navigation';
+import styles from './page.module.css';
 import sudokuData from '/src/sudokuData.json';
 import { generateSudoku } from "@/utils/sudoku/sudokuGenerator";
 import { solver } from "@/utils/sudoku/sudokuSolver"; // Импортируйте ваш JSON файл
 
 export default function SudokuOfTheDay() {
+    const router = useRouter();
     const [sudokuArr, setSudokuArr] = useState([]);
     const [initial, setInitial] = useState([]);
     const [errors, setErrors] = useState([]);
@@ -105,12 +107,21 @@ export default function SudokuOfTheDay() {
     };
 
     return (
-        <div className={styles.App}>
-            <div className={styles.header}>
-                <h1>Судоку дня</h1>
-                <SudokuBoard sudokuArr={sudokuArr} initial={initial} errors={errors} handleChange={handleChange} />
-                <ButtonPanel checkSudoku={checkSudoku} solveSudoku={solveSudoku} resetSudoku={resetSudoku} />
+        <>
+            <div className={styles.outer_container}>
+                <div className={styles.header}>
+                    <h1>Судоку дня</h1>
+                    <SudokuBoard setSudokuArr={setSudokuArr} sudokuArr={sudokuArr} initial={initial} errors={errors}
+                                 handleChange={handleChange}/>
+                    <ButtonPanel checkSudoku={checkSudoku} solveSudoku={solveSudoku} resetSudoku={resetSudoku}/>
+                </div>
             </div>
-        </div>
+            <button
+                className={styles.orangeButton}
+                onClick={() => router.push('/user/sudoku')}
+            >
+                +
+            </button>
+        </>
     );
 }

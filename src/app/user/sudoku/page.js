@@ -6,7 +6,7 @@ import SudokuBoard from '/src/components/sudoku/SudokuBoard';
 import ButtonPanel from '/src/components/sudoku/ButtonPanel';
 import { solver } from '/src/utils/sudoku/sudokuSolver';
 import { generateSudoku } from '/src/utils/sudoku/sudokuGenerator';
-import styles from '../../../styles/globals.css';
+import styles from './page.module.css';
 
 function Home() {
     const router = useRouter();
@@ -87,6 +87,16 @@ function Home() {
     }
 
     function solveSudoku() {
+        // Проверяем, заполнены ли все ячейки
+        // const isCompleted = sudokuArr.flat().every(cell => cell !== -1);
+        //
+        // if (!isCompleted) {
+        //     alert("Пожалуйста, заполните все ячейки перед решением судоку.");
+        //     return; // Прерываем выполнение, если не все ячейки заполнены
+        // }
+
+        const session = localStorage.getItem('session'); // Получение имени пользователя из локального хранилища
+
         try {
             const filledSudoku = generateSudoku(difficulty, false);
             const solvedBoard = solver(filledSudoku);
@@ -94,8 +104,25 @@ function Home() {
             setSudokuArr(solvedBoard);
             setIsRunning(false);
 
-            // Show notification
-            setNotification(`Игра закончена!\nВремя: ${timer}s\nОшибки: ${errorCount}\nСчет: **${Math.max(0, 81 - errorCount)}**`); // Example score calculation
+            // Рассчитываем очки
+            const score = Math.max(0, 81 - errorCount);
+
+            // Отправляем очки на сервер
+            fetch('/api/updateScore', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: JSON.parse(session).username, score }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    setNotification(`Игра закончена!\nВремя: ${timer}s\nОшибки: ${errorCount}\nСчет: **${score}**`);
+                })
+                .catch(err => {
+                    console.error("Ошибка при отправке очков:", err);
+                });
         } catch (error) {
             console.error("Ошибка при решении судоку:", error);
             alert("Произошла ошибка при решении судоку. Пожалуйста, попробуйте еще раз.");
@@ -103,13 +130,10 @@ function Home() {
     }
 
     function resetSudoku() {
-        const newSudokuArr = sudokuArr.map((row, rIndex) =>
-            row.map((cell, cIndex) =>
-                initial[rIndex][cIndex] === -1 ? -1 : cell
-            )
-        );
-        setSudokuArr(newSudokuArr);
+        setSudokuArr(generateSudoku(difficulty, false));
         setErrorCount(0);
+        setTimer(0);
+        setIsRunning(true);
     }
 
     useEffect(() => {
@@ -118,8 +142,6 @@ function Home() {
             if (isCompleted) {
                 setIsRunning(false);
             }
-        } else {
-            console.error("sudokuArr не является массивом:", sudokuArr);
         }
     }, [sudokuArr]);
 
@@ -134,12 +156,15 @@ function Home() {
                 </select>
                 <div>Время: {timer}s</div>
                 <div>Ошибки: {errorCount}</div>
-                <SudokuBoard
-                    sudokuArr={sudokuArr}
-                    setSudokuArr={setSudokuArr}
-                    initial={initial}
-                    errors={errors}
-                />
+                <div className={styles.sudoku_container}>
+                    <SudokuBoard
+                        sudokuArr={sudokuArr}
+                        setSudokuArr={setSudokuArr}
+                        initial={initial}
+                        errors={errors}
+                    />
+                </div>
+
                 <ButtonPanel
                     checkSudoku={checkSudoku}
                     solveSudoku={solveSudoku}

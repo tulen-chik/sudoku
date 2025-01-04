@@ -25,6 +25,7 @@ export async function POST(req) {
         // Возвращаем роль пользователя и сообщение об успешном входе
         return new Response(JSON.stringify({
             role: user.role,
+            username: user.username,
             message: 'Успешный вход'
         }), {
             status: 200,
